@@ -40,13 +40,13 @@ enum APIError: Error, LocalizedError, Equatable {
 /// Abstraction over the networking layer to enable dependency injection and
 /// testing. View models depend on this, not on the concrete `APIClient`.
 protocol APIClientProtocol: Sendable {
-    func send<T: Decodable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T
     func fetchItems() async throws -> [Item]
 }
 
 extension APIClientProtocol {
     /// Convenience overload that infers the decoded type from context.
-    func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T {
         try await send(endpoint, as: T.self)
     }
 }
@@ -72,7 +72,7 @@ actor APIClient: APIClientProtocol {
         self.decoder = decoder
     }
 
-    func send<T: Decodable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T {
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T {
         guard let request = endpoint.urlRequest(baseURL: baseURL) else {
             throw APIError.invalidRequest
         }
@@ -118,7 +118,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         self.result = result
     }
 
-    func send<T: Decodable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T {
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint, as type: T.Type) async throws -> T {
         // Not used directly by tests; provided for protocol conformance.
         throw APIError.invalidResponse
     }

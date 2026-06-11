@@ -12,6 +12,11 @@
 
 import AppKit
 
+// `@MainActor` isolates the whole delegate to the main actor, which Swift 6
+// strict concurrency requires before touching AppKit (`NSWindow`, view
+// controllers, the menu) from these callbacks. `main.swift` constructs the
+// delegate from the main-actor top-level context, so this composes cleanly.
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Window Controllers

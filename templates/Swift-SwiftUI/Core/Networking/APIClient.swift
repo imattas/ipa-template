@@ -72,7 +72,7 @@ enum APIError: Error, LocalizedError, Equatable {
 /// can be shared safely across concurrency domains.
 protocol APIClientProtocol: Sendable {
     /// Sends an endpoint and decodes the response body into `T`.
-    func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T
 
     /// Concrete convenience for the home feature.
     func fetchItems() async throws -> [Item]
@@ -97,7 +97,7 @@ actor APIClient: APIClientProtocol {
         self.decoder = decoder
     }
 
-    func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T {
         let request = try endpoint.urlRequest(baseURL: baseURL)
 
         let data: Data
@@ -152,7 +152,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         self.delay = delay
     }
 
-    func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T {
         if let error { throw error }
         if delay != .zero { try? await Task.sleep(for: delay) }
         // The template only mocks the items endpoint; extend as needed.

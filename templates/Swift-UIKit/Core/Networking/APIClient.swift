@@ -46,7 +46,7 @@ enum APIError: Error, Sendable {
 
 /// Abstraction over the network layer so view models can be tested with a mock.
 protocol APIClientProtocol: Sendable {
-    func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T
     func fetchItems() async throws -> [Item]
 }
 
@@ -79,7 +79,7 @@ actor APIClient: APIClientProtocol {
     }
 
     /// Sends an endpoint and decodes the response body into `T`.
-    func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
+    func send<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T {
         let request: URLRequest
         do {
             request = try endpoint.urlRequest(baseURL: baseURL)

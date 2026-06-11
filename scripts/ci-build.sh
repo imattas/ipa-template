@@ -51,7 +51,7 @@ sdk_path() {
 # is unavailable on this runner, fall back to a syntax-only parse so the job
 # still validates the code. Tests/ sources are always parse-only.
 swift_check() {
-    local sdk="$1" target="$2"
+    local sdk="$1" target="$2" extra="${3:-}"   # extra = additional swiftc flags
     local app_sources test_sources sdkp
     app_sources=$(find . -name '*.swift' -not -path '*/Tests/*' | sort)
     test_sources=$(find . -path '*/Tests/*' -name '*.swift' | sort)
@@ -63,14 +63,14 @@ swift_check() {
 
     sdkp="$(sdk_path "$sdk")"
     if [[ -n "$sdkp" ]]; then
-        echo "    swiftc -typecheck (sdk=$sdk target=$target)"
+        echo "    swiftc -typecheck (sdk=$sdk target=$target) $extra"
         # shellcheck disable=SC2086
         xcrun --sdk "$sdk" swiftc -typecheck -sdk "$sdkp" \
-            -target "$target" -swift-version 6 $app_sources
+            -target "$target" -swift-version 6 $extra $app_sources
     else
         echo "::warning::SDK '$sdk' not found on runner; parsing Swift instead of full typecheck"
         # shellcheck disable=SC2086
-        swiftc -parse $app_sources
+        swiftc -parse $extra $app_sources
     fi
 
     if [[ -n "$test_sources" ]]; then
@@ -91,10 +91,19 @@ objc_syntax() {
         echo "::warning::iphonesimulator SDK not found; skipping ObjC syntax check"
         return 0
     fi
-    # Add every directory that contains a header to the include path.
+    # Add every directory that contains a header (.h/.hpp/.hh) to the include
+    # path so both ObjC headers and bridged C++ headers resolve.
     includes=()
     while IFS= read -r d; do includes+=("-I$d"); done \
-        < <(find . -name '*.h' -exec dirname {} \; | sort -u)
+        < <(find . \( -name '*.h' -o -name '*.hpp' -o -name '*.hh' \) \
+            -exec dirname {} \; | sort -u)
+
+    # XCTest lives in the platform's Developer frameworks, not the SDK — add it
+    # so the Tests/ translation units can `#import <XCTest/XCTest.h>`.
+    local platform_fw=()
+    local platform_path
+    platform_path="$(xcrun --sdk iphonesimulator --show-sdk-platform-path 2>/dev/null || true)"
+    [[ -n "$platform_path" ]] && platform_fw=(-F "$platform_path/Library/Frameworks" -iframework "$platform_path/Library/Frameworks")
 
     local ext
     [[ "$lang" == "objective-c++" ]] && ext="mm" || ext="m"
@@ -102,7 +111,7 @@ objc_syntax() {
         echo "    $cc -fsyntax-only ($lang) $f"
         "$cc" -fsyntax-only -x "$lang" -fobjc-arc -isysroot "$sdkp" \
             -arch arm64 -mios-simulator-version-min=15.0 \
-            "${includes[@]}" "$@" "$f"
+            "${includes[@]}" "${platform_fw[@]}" "$@" "$f"
     done < <(find . -name "*.${ext}" | sort)
 }
 
@@ -128,7 +137,11 @@ case "$TEMPLATE" in
         swift_check xrsimulator arm64-apple-xros2.0-simulator
         ;;
     Metal)
-        swift_check iphonesimulator arm64-apple-ios17.0-simulator
+        # ShaderTypes.h holds the CPU/GPU shared structs (Vertex, Uniforms, …).
+        # In Xcode it is exposed to Swift via a bridging header; replicate that
+        # for the typecheck with -import-objc-header.
+        swift_check iphonesimulator arm64-apple-ios17.0-simulator \
+            "-import-objc-header Renderer/ShaderTypes.h"
         echo "    compiling Metal shaders -> AIR"
         sdkp="$(sdk_path iphoneos)"
         if [[ -n "$sdkp" ]]; then
