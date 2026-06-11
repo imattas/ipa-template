@@ -113,8 +113,8 @@ final class Renderer: NSObject, MTKViewDelegate {
         if let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) {
             encoder.label = "Triangle Render Pass"
             encoder.setRenderPipelineState(renderPipeline)
-            encoder.setVertexBuffer(vertexBuffer, offset: 0, index: Int(BufferIndexVertices.rawValue))
-            encoder.setVertexBuffer(buffers.currentUniformBuffer, offset: 0, index: Int(BufferIndexUniforms.rawValue))
+            encoder.setVertexBuffer(vertexBuffer, offset: 0, index: Int(BufferIndex.vertices.rawValue))
+            encoder.setVertexBuffer(buffers.currentUniformBuffer, offset: 0, index: Int(BufferIndex.uniforms.rawValue))
             encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexCount)
             encoder.endEncoding()
         }
@@ -150,9 +150,9 @@ final class Renderer: NSObject, MTKViewDelegate {
 
             encoder.label = "Parallel Transform"
             encoder.setComputePipelineState(computePipeline)
-            encoder.setBuffer(computeBuffer, offset: 0, index: Int(BufferIndexCompute.rawValue))
-            encoder.setBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: Int(BufferIndexUniforms.rawValue))
-            encoder.setBytes(&count, length: MemoryLayout<UInt32>.stride, index: Int(BufferIndexVertices.rawValue))
+            encoder.setBuffer(computeBuffer, offset: 0, index: Int(BufferIndex.compute.rawValue))
+            encoder.setBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: Int(BufferIndex.uniforms.rawValue))
+            encoder.setBytes(&count, length: MemoryLayout<UInt32>.stride, index: Int(BufferIndex.vertices.rawValue))
 
             // Choose a threadgroup size, then round the grid up to cover all
             // elements. The kernel guards against the rounded-up overshoot.
