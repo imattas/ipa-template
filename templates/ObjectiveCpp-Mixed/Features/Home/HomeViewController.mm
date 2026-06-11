@@ -1,5 +1,7 @@
 #import "HomeViewController.h"
 
+#include <initializer_list>  // for the range-based-for seed list below
+
 // We only need the pure-ObjC bridge here. Because the bridge header is
 // C++-free, this controller would compile even as a plain .m. We keep it as
 // .mm to illustrate that UIKit code can sit in an Objective-C++ TU.
