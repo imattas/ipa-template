@@ -1,0 +1,84 @@
+# ---------------------------------------------------------------------------
+# Xcode
+# ---------------------------------------------------------------------------
+## Build generated
+build/
+DerivedData/
+*.o
+*.lo
+*.la
+*.air
+*.metallib
+
+## Various Xcode settings / user state
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+
+## Xcode project cruft (keep project files, ignore local state)
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# ---------------------------------------------------------------------------
+# Swift Package Manager
+# ---------------------------------------------------------------------------
+.build/
+.swiftpm/
+Package.resolved
+
+# ---------------------------------------------------------------------------
+# CocoaPods / Carthage
+# ---------------------------------------------------------------------------
+Pods/
+Carthage/Build/
+
+# ---------------------------------------------------------------------------
+# CMake (C/C++ templates)
+# ---------------------------------------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+Testing/
+
+# ---------------------------------------------------------------------------
+# Distribution / archives
+# ---------------------------------------------------------------------------
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.app
+*.xcarchive
+
+# ---------------------------------------------------------------------------
+# Tooling / CI
+# ---------------------------------------------------------------------------
+build-logs/
+*.log
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# ---------------------------------------------------------------------------
+# macOS / editors
+# ---------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+*.swp
+*~
+.idea/
+.vscode/

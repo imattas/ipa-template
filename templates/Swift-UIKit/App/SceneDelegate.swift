@@ -1,0 +1,51 @@
+import UIKit
+
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+    var window: UIWindow?
+
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+
+        let window = UIWindow(windowScene: windowScene)
+
+        // Compose the root object graph here. Dependencies are constructed once
+        // and injected down into the view models (manual dependency injection).
+        let apiClient = APIClient()
+
+        let homeViewModel = HomeViewModel(apiClient: apiClient)
+        let homeViewController = HomeViewController(viewModel: homeViewModel)
+        let homeNav = UINavigationController(rootViewController: homeViewController)
+        homeNav.tabBarItem = UITabBarItem(
+            title: "Home",
+            image: UIImage(systemName: "house"),
+            selectedImage: UIImage(systemName: "house.fill")
+        )
+
+        let settingsViewModel = SettingsViewModel()
+        let settingsViewController = SettingsViewController(viewModel: settingsViewModel)
+        let settingsNav = UINavigationController(rootViewController: settingsViewController)
+        settingsNav.tabBarItem = UITabBarItem(
+            title: "Settings",
+            image: UIImage(systemName: "gearshape"),
+            selectedImage: UIImage(systemName: "gearshape.fill")
+        )
+
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [homeNav, settingsNav]
+
+        window.rootViewController = tabBarController
+        window.makeKeyAndVisible()
+        self.window = window
+    }
+
+    func sceneDidDisconnect(_ scene: UIScene) {}
+    func sceneDidBecomeActive(_ scene: UIScene) {}
+    func sceneWillResignActive(_ scene: UIScene) {}
+    func sceneWillEnterForeground(_ scene: UIScene) {}
+    func sceneDidEnterBackground(_ scene: UIScene) {}
+}

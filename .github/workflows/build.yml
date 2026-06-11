@@ -1,0 +1,82 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref to save runner minutes.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # One job per template. They run in parallel and are independent:
+  # `fail-fast: false` means one template failing does not cancel the others
+  # (failure isolation), and each prints/uploads its own log.
+  template:
+    name: ${{ matrix.template }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template:
+          - Swift-UIKit
+          - Swift-SwiftUI
+          - ObjectiveC-UIKit
+          - ObjectiveCpp-Mixed
+          - Metal
+          - visionOS-RealityKit
+          - watchOS-SwiftUI
+          - macOS-AppKit
+          - C-Library
+          - CPlusPlus-Framework
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          # Pin to the newest stable Xcode available on the runner image so the
+          # iOS/macOS/watchOS/visionOS SDKs and the Metal toolchain are present.
+          sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+          echo "SDKs:"; xcodebuild -showsdks 2>/dev/null || true
+
+      - name: Build ${{ matrix.template }}
+        id: build
+        run: |
+          set -o pipefail
+          mkdir -p build-logs
+          bash scripts/ci-build.sh "${{ matrix.template }}" \
+            2>&1 | tee "build-logs/${{ matrix.template }}.log"
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ matrix.template }}
+          path: build-logs/${{ matrix.template }}.log
+          retention-days: 14
+
+  # A tiny gate job so branch protection can require a single check that all
+  # templates passed, rather than ten individual ones.
+  all-templates:
+    name: all-templates
+    runs-on: ubuntu-latest
+    needs: template
+    if: always()
+    steps:
+      - name: Verify every template job succeeded
+        run: |
+          if [[ "${{ needs.template.result }}" != "success" ]]; then
+            echo "::error::One or more template builds failed."
+            exit 1
+          fi
+          echo "All template builds passed."

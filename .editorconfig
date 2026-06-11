@@ -1,0 +1,39 @@
+# EditorConfig — consistent formatting across editors/IDEs.
+# https://editorconfig.org
+root = true
+
+# Defaults for every file.
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# Swift, Objective-C, Objective-C++, C, C++, Metal.
+[*.{swift,h,m,mm,c,cpp,hpp,metal}]
+indent_style = space
+indent_size = 4
+
+# Apple keeps these as 2-space, structured formats.
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# plist / storyboard / xcassets are tab-indented by Xcode; don't fight it.
+[*.{plist,storyboard,xib,pbxproj}]
+indent_style = tab
+trim_trailing_whitespace = false
+
+# Markdown — trailing whitespace can be meaningful (hard line breaks).
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Makefiles require real tabs.
+[Makefile]
+indent_style = tab
+
+[{Makefile,*.mk}]
+indent_style = tab

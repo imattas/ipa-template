@@ -1,1 +1,99 @@
-# ipa-template
+# ipa-template — Apple Platform App Templates
+
+![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main)
+
+A collection of **production-ready scaffolding** for every major Apple-platform
+toolchain. Each template is a full, opinionated skeleton — architecture,
+networking layer, storage, navigation, tests, docs, and CI wiring — not a
+"hello world." Pick the one that matches your target, copy it, and start
+building a real app on top of it.
+
+Every template shares the same conventions so moving between them is easy:
+
+- **Modern concurrency** — Swift 6 language mode, `async`/`await`, actors, and
+  `@MainActor` isolation where appropriate.
+- **`@Observable` view models** (iOS 17 / macOS 14+) with an inline note on the
+  pre-iOS-17 `ObservableObject` / `@Published` fallback.
+- **A stubbed async networking layer** — `APIClient` + `Endpoint` with a typed
+  error enum and a worked `async` fetch example, behind a protocol so it's
+  mockable.
+- **Wired-up tests** — at least two stubbed unit tests per template so the test
+  target exists from day one.
+- **Per-template `docs/`** — `ARCHITECTURE.md`, `SETUP.md`, and (where relevant)
+  `CONTRIBUTING.md`.
+
+## Templates
+
+| Template | Language | Platform | Pattern | CI |
+|---|---|---|---|---|
+| [Swift-UIKit](templates/Swift-UIKit) | Swift | iOS / iPadOS | MVVM + DI | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [Swift-SwiftUI](templates/Swift-SwiftUI) | Swift | iOS / iPadOS / macOS | MVVM + NavigationStack router | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [ObjectiveC-UIKit](templates/ObjectiveC-UIKit) | Objective-C | iOS / iPadOS | MVC | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [ObjectiveCpp-Mixed](templates/ObjectiveCpp-Mixed) | Objective-C++ / C++ | iOS | Pimpl bridge (C++ core) | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [Metal](templates/Metal) | Swift + Metal | iOS | Renderer (MTKViewDelegate) | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [visionOS-RealityKit](templates/visionOS-RealityKit) | Swift + RealityKit | visionOS | MVVM + dual-scene | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [watchOS-SwiftUI](templates/watchOS-SwiftUI) | Swift + WatchKit | watchOS | MVVM | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [macOS-AppKit](templates/macOS-AppKit) | Swift + AppKit | macOS | MVVM | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [C-Library](templates/C-Library) | C (C11) | cross-platform | Static library | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+| [CPlusPlus-Framework](templates/CPlusPlus-Framework) | C++ (C++17) | cross-platform | Framework / library | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
+
+> All templates are built by a single matrix workflow
+> ([`.github/workflows/build.yml`](.github/workflows/build.yml)) with **one
+> independent job per template**, so a failure in one never blocks the others.
+> The shared badge above reflects that workflow's latest run on `main`. See
+> [`docs/CI.md`](docs/CI.md) for how the per-template jobs and logs work.
+
+## Quick start
+
+```sh
+# 1. Clone
+git clone https://github.com/imattas/ipa-template.git
+cd ipa-template
+
+# 2. Pick a template and copy it out as the seed of your new app
+cp -R templates/Swift-SwiftUI ~/Developer/MyNewApp
+cd ~/Developer/MyNewApp
+
+# 3. Open in Xcode (create a new App project and drag in the source groups,
+#    or add the sources to an SPM/Xcode target — see the template's docs/SETUP.md)
+open -a Xcode .
+```
+
+The C / C++ templates build and test from the command line directly:
+
+```sh
+cd templates/C-Library           && make test
+cd templates/CPlusPlus-Framework && make test   # or: cmake -B build && ctest --test-dir build
+```
+
+## Repository layout
+
+```
+ipa-template/
+├── templates/             One directory per template (the scaffolds)
+├── docs/                  Cross-cutting docs
+│   ├── TEMPLATES.md       Overview of every template + when to use each
+│   ├── COMPARISON.md      Swift vs ObjC vs SwiftUI tradeoffs
+│   └── CI.md              How the GitHub Actions pipeline works
+├── scripts/
+│   └── ci-build.sh        Per-template build dispatcher (used by CI + locally)
+├── .github/workflows/
+│   └── build.yml          Matrix CI: one job per template
+├── .gitignore
+├── .editorconfig
+└── README.md
+```
+
+## Deep dive
+
+- **Which template should I use?** → [`docs/TEMPLATES.md`](docs/TEMPLATES.md)
+- **Swift vs Objective-C vs SwiftUI tradeoffs** → [`docs/COMPARISON.md`](docs/COMPARISON.md)
+- **How CI compiles each template** → [`docs/CI.md`](docs/CI.md)
+
+Each template also carries its own `README.md` and `docs/` describing its
+architecture, setup, and contribution guidelines.
+
+## License
+
+Released under the [MIT License](LICENSE). Use these templates freely as the
+starting point for your own apps, commercial or otherwise.
