@@ -37,11 +37,25 @@ Every template shares the same conventions so moving between them is easy:
 | [C-Library](templates/C-Library) | C (C11) | cross-platform | Static library | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
 | [CPlusPlus-Framework](templates/CPlusPlus-Framework) | C++ (C++17) | cross-platform | Framework / library | ![build](https://github.com/imattas/ipa-template/actions/workflows/build.yml/badge.svg?branch=main) |
 
-> All templates are built by a single matrix workflow
+> ✅ **All 10 templates currently build green** on `macos-latest`. They're built
+> by a single matrix workflow
 > ([`.github/workflows/build.yml`](.github/workflows/build.yml)) with **one
 > independent job per template**, so a failure in one never blocks the others.
 > The shared badge above reflects that workflow's latest run on `main`. See
 > [`docs/CI.md`](docs/CI.md) for how the per-template jobs and logs work.
+
+## 📚 Learn it — the "Build Your Own App" course
+
+New to the repo? The [**tutorials course**](docs/tutorials/) walks you from
+cloning a template to shipping a finished app on the App Store, in 15 hands-on
+modules grounded in this repo's real code. Start at the
+[course index](docs/tutorials/README.md), or jump in:
+
+- [Module 01 — Getting Started](docs/tutorials/01-getting-started.md)
+- [Module 03 — Building Your First Feature](docs/tutorials/03-your-first-feature.md)
+- [Module 04 — The Networking Layer](docs/tutorials/04-the-networking-layer.md)
+- [Module 12 — Platform Deep Dives](docs/tutorials/12-platform-deep-dives.md)
+- [Module 15 — Capstone: Build a Complete App](docs/tutorials/15-capstone-project.md)
 
 ## Quick start
 
@@ -74,7 +88,8 @@ ipa-template/
 ├── docs/                  Cross-cutting docs
 │   ├── TEMPLATES.md       Overview of every template + when to use each
 │   ├── COMPARISON.md      Swift vs ObjC vs SwiftUI tradeoffs
-│   └── CI.md              How the GitHub Actions pipeline works
+│   ├── CI.md              How the GitHub Actions pipeline works
+│   └── tutorials/         "Build Your Own App" course (15 modules)
 ├── scripts/
 │   └── ci-build.sh        Per-template build dispatcher (used by CI + locally)
 ├── .github/workflows/
@@ -86,6 +101,7 @@ ipa-template/
 
 ## Deep dive
 
+- **Build an app step by step** → [`docs/tutorials/`](docs/tutorials/) (the course)
 - **Which template should I use?** → [`docs/TEMPLATES.md`](docs/TEMPLATES.md)
 - **Swift vs Objective-C vs SwiftUI tradeoffs** → [`docs/COMPARISON.md`](docs/COMPARISON.md)
 - **How CI compiles each template** → [`docs/CI.md`](docs/CI.md)
